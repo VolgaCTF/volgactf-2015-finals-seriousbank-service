@@ -1,0 +1,2 @@
+django-1.8.4
+cryptography > 0.9
