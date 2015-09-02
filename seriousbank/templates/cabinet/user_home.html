@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Billing System</title>
+  </head>
+  <body>
+  	<h3> Hello {{ username }} </h4>
+  	<h4> Summary {{ account_summary }} </h4>
+    {% for bill in billing_story %}
+      <div>{{ bill.bid }} % {{ bill.sign }}</div>
+    {% endfor %}
+  </body>
+</html>
