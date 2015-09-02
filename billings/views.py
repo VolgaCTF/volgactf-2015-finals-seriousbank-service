@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.edit import View
 from django.utils import timezone
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError, Http404
 from django.contrib.auth.models import User
 from billings.forms import BillingForm
 from billings.helpers import set_cookie, gen_password, validate_permissions
@@ -49,10 +49,14 @@ class ValidateTransaction(View):
 			billing = user.accountbilling_set.get(sign__iexact=transaction)
 			passwd = gen_password(user.password)
 			_cryptor = self.default_cryptor(*passwd)
-			sign = _cryptor.decrypt(billing.sign)
+			try:
+				sign = _cryptor.decrypt(billing.sign)
+			except Exception as ex:
+				return HttpResponseServerError()
+
 			if validate_permissions(request.user, name):
 				return HttpResponse(sign)
 			else:
-				return HttpResponse('502')
+				raise Http404("User don't have permissions to validate transactions")
 		else:
-			return HttpResponse('404')
+			raise Http404("Transaction is empty")
