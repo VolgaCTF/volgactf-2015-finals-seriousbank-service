@@ -1,21 +1,22 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
+from django.contrib.auth.models import User
 from django.views.generic.base import TemplateView
 from billings.models import AccountBilling
 # Create your views here.
 
 class UserHomePage(TemplateView):
 	template_name = "cabinet/user_home.html"
-	login_requred = "/login/"
 	user = None
 
-	def get(self, request, *args, **kwargs):
-		if request.user.is_authenticated():
-			self.user = request.user
-			context = self.get_context_data(**kwargs)
-			return self.render_to_response(context)
-		else:
-			return HttpResponseRedirect(self.login_requred)
+	def get(self, request, index, *args, **kwargs):
+		try:
+			self.user = User.objects.get(pk=index)
+		except Exception as ex:
+			raise Http404("User not found")
+
+		context = self.get_context_data(**kwargs)
+		return self.render_to_response(context)
 
 	def get_context_data(self, **kwargs):
 		ctx = super(UserHomePage, self).get_context_data(**kwargs)

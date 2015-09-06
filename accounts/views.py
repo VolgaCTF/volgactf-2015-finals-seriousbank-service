@@ -16,7 +16,7 @@ class RegisterFormView(FormView):
 
 class LoginFormView(View):
     form_class = LoginForm
-    success_url = "/home/"
+    success_url = "/user/%d/"
     template_name = "accounts/login.html"
 
     def get(self, request):
@@ -30,7 +30,7 @@ class LoginFormView(View):
         						password=form.cleaned_data['password'])
     		if user is not None:
     			login(request, user)
-    			return HttpResponseRedirect(self.success_url)
+    			return HttpResponseRedirect(self.success_url % user.pk)
 
     	return render(request, self.template_name, {'form' : form })
 
