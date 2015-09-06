@@ -16,7 +16,6 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls import include, url
-from django.contrib import admin
 from django.contrib.auth.views import login, logout
 from accounts.views import RegisterFormView, LoginFormView, LogOutView, account
 from billings.views import CreateBilling, ValidateTransaction
@@ -25,7 +24,6 @@ from seriousbank.views import IndexPage
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^register/$', RegisterFormView.as_view()),
     url(r'^login/$', LoginFormView.as_view()),
     url(r'^logout/$', LogOutView.as_view()),
