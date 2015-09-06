@@ -40,9 +40,3 @@ class LogOutView(View):
 	def get(self, request):
 		logout(request)
 		return HttpResponseRedirect(self.success_url)
-		
-
-def account(request, name):
-	user = User.objects.get(username__iexact=name)
-	print user.password
-	return HttpResponse("ok")

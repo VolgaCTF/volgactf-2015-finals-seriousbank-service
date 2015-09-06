@@ -27,7 +27,11 @@ class CreateBilling(View):
 				billing.user = request.user
 					
 				_cryptor = self.default_cryptor(*gen_password(request.user.password))
-				billing.sign = _cryptor.encrypt(billing.sign.encode('ascii'))
+
+				try:
+					billing.sign = _cryptor.encrypt(billing.sign.encode('ascii'))
+				except Exception as ex:
+					return HttpResponseServerError(str(ex).encode('utf-8'))
 
 				billing.transaction_timestamp = timezone.now()
 				billing.save()
@@ -46,13 +50,12 @@ class ValidateTransaction(View):
 		user = User.objects.get(username__iexact=name)
 		transaction = request.COOKIES.get('accepted_transaction')
 		if transaction is not None:
-			billing = user.accountbilling_set.get(sign__iexact=transaction)
 			passwd = gen_password(user.password)
 			_cryptor = self.default_cryptor(*passwd)
 			try:
-				sign = _cryptor.decrypt(billing.sign)
+				sign = _cryptor.decrypt(transaction)
 			except Exception as ex:
-				return HttpResponseServerError()
+				return HttpResponseServerError(str(ex).encode('utf-8'))
 
 			if validate_permissions(request.user, name):
 				return HttpResponse(sign)
