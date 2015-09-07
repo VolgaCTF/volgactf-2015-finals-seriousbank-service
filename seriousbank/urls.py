@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.conf.urls import include, url
 from django.contrib.auth.views import login, logout
 from accounts.views import RegisterFormView, LoginFormView, LogOutView
-from billings.views import CreateBilling, ValidateTransaction
+from billings.views import CreateBilling, CheckTransaction, ValidateTransaction
 from cabinet.views import UserHomePage
 from seriousbank.views import IndexPage
 
@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^login/$', LoginFormView.as_view()),
     url(r'^logout/$', LogOutView.as_view()),
     url(r'^billing/$', CreateBilling.as_view()),
-    url(r'^billing/(?P<name>[\w]{0,50})/$', ValidateTransaction.as_view()),
+    url(r'^billing/(?P<name>[\w]{0,50})/$', CheckTransaction.as_view()),
+    url(r'^validate/(?P<tid>[\W\w]+)/$', ValidateTransaction.as_view()),
     url(r'^user/(?P<index>[0-9]+)/$', UserHomePage.as_view()),
     url(r'^$', IndexPage.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

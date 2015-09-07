@@ -7,6 +7,7 @@ from billings.forms import BillingForm
 from billings.helpers import set_cookie, gen_password, validate_permissions
 from billings.crypto import DESCryptor
 from billings.validate import TransactionValidator
+from billings.models import ValidatedTransaction
 
 # Create your views here.
 
@@ -41,33 +42,26 @@ class CreateBilling(View):
 				_validator = self.default_validator()
 
 				try:
-					trz_data = _validator.invalidate(request.user.username, billing.sign)
+					trz_sign = _validator.invalidate(request.user.username, billing.sign)
 				except Exception as ex:
 					return HttpResponseServerError(str(ex).encode('utf-8'))
 
 				response = HttpResponseRedirect(self.success_url % request.user.id)
-				set_cookie(response, 'accepted_transaction', trz_data)
+				set_cookie(response, 'transaction_sign', trz_sign)
+				set_cookie(response, 'transaction_id', billing.sign)
 				return response
 			else:
 				form.add_error(None, "User must be logged in to create billings")		
 		return render(request, self.template_name, {'form' : form })
 
 
-class ValidateTransaction(View):
+class CheckTransaction(View):
 	default_cryptor = DESCryptor
-	default_validator = TransactionValidator
 
 	def get(self, request, name):
 		user = User.objects.get(username__iexact=name)
-		transaction = request.COOKIES.get('accepted_transaction')
-		if transaction is not None:
-
-			_validator = self.default_validator()
-
-			try:
-				transaction_id = _validator.get_id(transaction)
-			except Exception as ex:
-				raise Http404(ex)
+		transaction_id = request.COOKIES.get('transaction_id')
+		if transaction_id is not None:
 
 			passwd = gen_password(user.password)
 			_cryptor = self.default_cryptor(*passwd)
@@ -77,13 +71,35 @@ class ValidateTransaction(View):
 			except Exception as ex:
 				return HttpResponseServerError(str(ex).encode('utf-8'))
 				
-
 			if validate_permissions(request.user, name):
-				if _validator.validate(name, transaction_id):
-					return HttpResponse(sign)
-				else:
-					raise Http404("User don't have this transaction")
+				return HttpResponse(sign)
 			else:
-				raise Http404("User don't have permissions to validate transaction")
+				raise Http404("User don't have permissions to check this transaction")
 		else:
-			raise Http404("Transaction is empty")
+			raise Http404("Transaction id is empty")
+
+class ValidateTransaction(View):
+	default_validator = TransactionValidator
+	template_name = "billings/status.html"
+
+	def get(self, request, tid):
+
+		try:
+			transaction = ValidatedTransaction.objects.raw(
+				"select * from billings_validatedtransaction where tranzaction_id = '%s'" % tid)
+		except Exception as ex:
+			return HttpResponseServerError(ex)
+
+		transaction_sign = request.COOKIES.get('transaction_sign')
+		if transaction_sign is not None:
+
+			try:
+				_validator = self.default_validator()
+				if _validator.validate(transaction, transaction_sign):
+					return render(request, self.template_name, {"transaction": transaction, "status":"validated"})
+				else:
+					return render(request, self.template_name, {"transaction": transaction, "status":"unvalidated"})
+			except Exception as ex:
+				return HttpResponseServerError(ex)
+		else:
+			raise Http404("Transaction sign is empty")
