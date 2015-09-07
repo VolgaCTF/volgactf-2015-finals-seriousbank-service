@@ -96,7 +96,9 @@ class ValidateTransaction(View):
 			try:
 				_validator = self.default_validator()
 				if _validator.validate(transaction, transaction_sign):
-					return render(request, self.template_name, {"transaction": transaction, "status":"validated"})
+					resp = render(request, self.template_name, {"transaction": transaction, "status":"validated"})
+					set_cookie(resp, "valid", "True")
+					return resp
 				else:
 					return render(request, self.template_name, {"transaction": transaction, "status":"unvalidated"})
 			except Exception as ex:
