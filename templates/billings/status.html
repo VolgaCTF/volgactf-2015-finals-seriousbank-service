@@ -3,14 +3,9 @@
   <head>
     <title>Billing System</title>
   </head>
-  <body>      
-      {% for x in transaction %}
-      		<div> 
-      		<p>{{ x.username }}</p>
-      		<p>{{ x.tranzaction_id }}</p> 
-          <p>Status: {{ status }}</p>
-      		</div>
-      {% endfor %}
-    </form>
+  <body>   
+   
+      <p>Your {{ transaction }} is {{ status }}</p>
+
   </body>
 </html>

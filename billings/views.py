@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseServerError, Http404
 from django.contrib.auth.models import User
 from billings.forms import BillingForm
-from billings.helpers import set_cookie, gen_password, validate_permissions
+from billings.helpers import set_cookie, gen_password, validate_permissions, perform_query
 from billings.crypto import DESCryptor
 from billings.validate import TransactionValidator
 from billings.models import ValidatedTransaction
@@ -82,14 +82,15 @@ class ValidateTransaction(View):
 	default_validator = TransactionValidator
 	template_name = "billings/status.html"
 
+	def query_transaction(self, tid):
+		transaction = perform_query(
+				ValidatedTransaction, 
+				"select * from billings_validatedtransaction where tranzaction_id = '%s'" % tid)
+		return transaction
+
 	def get(self, request, tid):
 
-		try:
-			transaction = ValidatedTransaction.objects.raw(
-				"select * from billings_validatedtransaction where tranzaction_id = '%s'" % tid)
-		except Exception as ex:
-			return HttpResponseServerError(ex)
-
+		transaction = self.query_transaction(tid)
 		transaction_sign = request.COOKIES.get('transaction_sign')
 		if transaction_sign is not None:
 

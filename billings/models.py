@@ -12,3 +12,6 @@ class ValidatedTransaction(models.Model):
 	username = models.CharField(max_length=30)
 	tranzaction_id = models.CharField(max_length=500)
 	is_validated = models.BooleanField()
+
+	def __str__(self):
+		return ("%s %s %s" % (self.username, self.tranzaction_id, self.is_validated))
