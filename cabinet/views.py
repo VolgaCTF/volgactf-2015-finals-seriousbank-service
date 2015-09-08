@@ -6,7 +6,7 @@ from billings.models import AccountBilling
 # Create your views here.
 
 class UserHomePage(TemplateView):
-	template_name = "cabinet/user_home.html"
+	template_name = "cabinet/personal.cabinet.html"
 	user = None
 
 	def get(self, request, index, *args, **kwargs):

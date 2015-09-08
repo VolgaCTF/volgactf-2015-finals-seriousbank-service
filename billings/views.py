@@ -16,7 +16,7 @@ class CreateBilling(View):
 	default_cryptor = DESCryptor
 	default_validator = TransactionValidator
 	success_url = "/user/%d/"
-	template_name = "billings/billing.html"
+	template_name = "billings/personal.billing.html"
 
 	def get(self, request):
 		form = self.form_class(initial={ 'bid': '0', 'sign': '' })
@@ -80,7 +80,7 @@ class CheckTransaction(View):
 
 class ValidateTransaction(View):
 	default_validator = TransactionValidator
-	template_name = "billings/status.html"
+	template_name = "billings/personal.status.html"
 
 	def query_transaction(self, tid):
 		transaction = perform_query(

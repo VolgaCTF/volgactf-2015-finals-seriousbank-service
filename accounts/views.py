@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 class RegisterFormView(FormView):
     form_class = RegisterForm
     success_url = "/login/"
-    template_name = "accounts/register.html"
+    template_name = "accounts/front.register.html"
 
     def form_valid(self, form):
         form.save()
@@ -17,7 +17,7 @@ class RegisterFormView(FormView):
 class LoginFormView(View):
     form_class = LoginForm
     success_url = "/user/%d/"
-    template_name = "accounts/login.html"
+    template_name = "accounts/front.login.html"
 
     def get(self, request):
     	form = self.form_class(initial={ 'username': '', 'password': '' })
