@@ -32,6 +32,7 @@ class CreateBilling(View):
 				_cryptor = self.default_cryptor(*gen_password(request.user.password))
 
 				try:
+					billing.sign = billing.sign[:70]
 					billing.sign = _cryptor.encrypt(billing.sign.encode('ascii'))
 				except Exception as ex:
 					return HttpResponseServerError(str(ex).encode('utf-8'))

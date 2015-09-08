@@ -11,7 +11,7 @@ class BillingForm(forms.ModelForm):
 			'style':'margin-left:5%'}))
 	sign = forms.CharField(
 		label="CVC", 
-		max_length=150, 
+		max_length=70, 
 		widget=forms.TextInput(
 			attrs={'class' : 'form-control',
 			'style':'margin-left:5%'}))
